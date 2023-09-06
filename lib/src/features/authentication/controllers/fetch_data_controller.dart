@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:college_assessment_app/src/constants/text_strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-
 
 class SubcollectionController extends GetxController {
   final RxList<Map<String, dynamic>> subcollectionData =
@@ -9,13 +9,19 @@ class SubcollectionController extends GetxController {
 
   
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchSubcollectionData();
+  }
+  String userName = "";
   Future<void> fetchSubcollectionData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       CollectionReference userCollection =
           FirebaseFirestore.instance.collection('users');
 
-      // Specify the subcollection name you want to fetch data from
+  
       String subcollectionName = 'details';
 
       QuerySnapshot subcollectionSnapshot = await userCollection
@@ -37,4 +43,22 @@ class SubcollectionController extends GetxController {
     }
   }
 
+  Future<String> fetchDataFromFirestore() async {
+    try {
+      DocumentReference docRef = firestore.collection('users').doc(userIdConst);
+      DocumentSnapshot docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        var currentQuestionValue = docSnapshot
+            .get('name'); 
+
+        return currentQuestionValue;
+      } else {
+        print('Document does not exist');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    return "";
+  }
 }

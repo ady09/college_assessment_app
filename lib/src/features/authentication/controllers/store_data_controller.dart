@@ -4,18 +4,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 
-class StoreDataController extends GetxController{
-  
+
+class StoreDataController extends GetxController {
   User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> storeData(String city, String state, String type, String college,
-      int pincode, Timestamp timestamp) async {
+      int pincode, Timestamp timestamp, int currentQuestion) async {
     if (user != null) {
       CollectionReference userCollection =
           FirebaseFirestore.instance.collection('users');
 
       DocumentReference newCollectionRef =
-          userCollection.doc(user?.uid).collection('details').doc();
+          userCollection.doc(user?.uid).collection('details').doc(college);
+
+      
 
       Details storeData = Details(
           city: city,
@@ -23,11 +25,14 @@ class StoreDataController extends GetxController{
           state: state,
           college: college,
           pincode: pincode,
-          timestamp: timestamp);
+          timestamp: timestamp,
+          currentQuestion: currentQuestion);
 
       Map<String, dynamic> newData = storeData.toJson();
+      
 
       await newCollectionRef.set(newData);
+      
     }
   }
 }

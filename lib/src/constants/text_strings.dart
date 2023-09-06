@@ -18,9 +18,11 @@ const String fullName = "Full Name";
 const String done = "Done";
 const String myAssessments = "My Assessments";
 
+User? user = firebaseAuth.currentUser; 
 
 
 var firebaseAuth = FirebaseAuth.instance;
 var firebaseStorage = FirebaseStorage.instance;
 var firestore = FirebaseFirestore.instance;
 var authController = AuthController.instance;
+String? userIdConst = user?.uid;

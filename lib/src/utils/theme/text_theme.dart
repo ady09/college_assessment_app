@@ -65,11 +65,11 @@ class CustomTextTheme {
 
   static TextStyle get smContent {
     return GoogleFonts.lato(
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color.fromARGB(156, 0, 0, 0)));
+        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color.fromARGB(156, 0, 0, 0)));
   }
 
   static TextStyle get questionTitleStyle {
     return GoogleFonts.lato(
-        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color.fromARGB(205, 0, 0, 0)));
+        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color.fromARGB(186, 0, 0, 0)));
   }
 }

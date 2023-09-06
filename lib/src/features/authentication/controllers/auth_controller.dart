@@ -47,7 +47,7 @@ class AuthController extends GetxController {
         Get.snackbar("Something Went Wrong!", "Please Enter All The Details!");
       }
     } catch (e) {
-      Get.snackbar("Please Check The Entered Details", e.toString());
+      Get.snackbar("Please Check The Entered Details", "Something Went Wrong");
     }
   }
 
@@ -62,7 +62,7 @@ class AuthController extends GetxController {
         Get.snackbar("Something Went Wrong!", "Please Enter All The Details!");
       }
     } catch (e) {
-      Get.snackbar("Please Check The Entered Details", e.toString());
+      Get.snackbar("Please Check The Entered Details", "Something Went Wrong");
     }
   }
 }

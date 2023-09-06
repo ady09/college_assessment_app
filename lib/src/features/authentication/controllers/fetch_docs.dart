@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+
 class FetchDocsController extends GetxController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -48,4 +50,6 @@ class FetchDocsController extends GetxController {
       print('Error fetching subcollection document: $error');
     }
   }
+
+  
 }

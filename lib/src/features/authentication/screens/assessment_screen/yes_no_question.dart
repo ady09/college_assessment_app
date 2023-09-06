@@ -7,38 +7,44 @@ import '../../models/assessment.dart';
 class YesNoQuestion extends StatelessWidget {
 
   
-final AssessmentController assessmentController =
-      Get.put(AssessmentController());
+// final AssessmentController assessmentController =
+//       Get.put(AssessmentController());
 
+final AssessmentController assessmentController =
+      Get.find();
   final Question question;
 
   YesNoQuestion({super.key, required this.question});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-             assessmentController.setAnswer(
-               assessmentController.currentQuestionIndex.value,
-              'Yes',
-            );
-          },
-          child: const Text('Yes'),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: () {
-            assessmentController.setAnswer(
-            assessmentController.currentQuestionIndex.value,
-              'No',
-            );
-          },
-          child: const Text('No'),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            
+            onPressed: () {
+               assessmentController.setAnswer(
+                 assessmentController.currentQuestionIndex.value,
+                'Yes',
+              );
+            },
+            child: const Text('Yes'),
+          ),
+          const SizedBox(width: 16),
+          ElevatedButton(
+            onPressed: () {
+              assessmentController.setAnswer(
+              assessmentController.currentQuestionIndex.value,
+                'No',
+              );
+            },
+            child: const Text('No'),
+          ),
+        ],
+      ),
     );
   }
 }

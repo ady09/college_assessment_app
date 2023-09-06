@@ -7,7 +7,7 @@ import '../../models/assessment.dart';
 class TextQuestion extends StatelessWidget {
   final Question question;
   final AssessmentController assessmentController =
-      Get.put(AssessmentController());
+      Get.find();
 
   TextQuestion({super.key, required this.question});
 

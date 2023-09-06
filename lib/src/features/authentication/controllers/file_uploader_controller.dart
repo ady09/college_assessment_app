@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -25,6 +27,8 @@ class FileUploadController extends GetxController {
   Rx<PickedFile?> selectedFile = Rx<PickedFile?>(null);
   String downloadURL = '';
   User? user = FirebaseAuth.instance.currentUser;
+  var isUploading = false.obs;
+  var uploadProgress = 0.0.obs;
 
   Future<void> pickFile(ImageSource source) async {
     try {
@@ -65,11 +69,12 @@ class FileUploadController extends GetxController {
   Future<void> uploadFileWithGeoTag() async {
     try {
       if (selectedFile.value != null) {
+        isUploading(true);
         // Get the current location data
         Position position = await getCurrentLocation();
 
-        String userId =
-            'user123'; // Replace with your user ID or any unique identifier
+        String? userId = user?.uid;
+        // Replace with your user ID or any unique identifier
         String fileExtension = selectedFile.value!.path.split('.').last;
         Reference storageReference = FirebaseStorage.instance
             .ref()
@@ -78,6 +83,13 @@ class FileUploadController extends GetxController {
         UploadTask uploadTask = storageReference.putFile(
           File(selectedFile.value!.path),
         );
+
+        uploadTask.snapshotEvents.listen((TaskSnapshot event) {
+          final double progress =
+              event.bytesTransferred / event.totalBytes;
+          uploadProgress.value = progress;
+        });
+
 
         await uploadTask.whenComplete(() async {
           print('File uploaded successfully');
@@ -92,6 +104,7 @@ class FileUploadController extends GetxController {
 
           // Store geotag information in Firestore
           await storeGeoTagInfo(geotag);
+          isUploading(false);
         });
 
         // Use the downloadURL and geotag information as needed
@@ -99,6 +112,7 @@ class FileUploadController extends GetxController {
         print(
             'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
       } else {
+        Get.snackbar("Error", "Please Upload Image/Video");
         print('No file selected');
       }
     } catch (e) {
@@ -106,17 +120,17 @@ class FileUploadController extends GetxController {
     }
   }
 
-   Future <Position> getCurrentLocation() async {
+  Future<Position> getCurrentLocation() async {
     try {
       await _requestLocationPermission();
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 5),
+        timeLimit: const Duration(seconds: 25),
       );
       return position;
     } catch (e) {
       print('Error getting location: $e');
-      // Provide a fallback location or handle errors gracefully
+     
       return Position(
           latitude: 0.0,
           longitude: 0.0,
@@ -131,10 +145,10 @@ class FileUploadController extends GetxController {
 
   Future<void> storeGeoTagInfo(Geotag geotag) async {
     try {
-      // Initialize the Firestore reference
+     
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      // Add geotag information to Firestore
+    
       await firestore
           .collection('users')
           .doc(user?.uid)
@@ -145,7 +159,12 @@ class FileUploadController extends GetxController {
         'longitude': geotag.longitude,
         'timestamp': FieldValue.serverTimestamp(),
       });
-
+      Get.snackbar(
+        "Success",
+        "File has been successfully uploaded!",
+        icon: Icon(Icons.done),
+        snackPosition: SnackPosition.BOTTOM,
+      );
       print('Geotag information stored in Firestore');
     } catch (e) {
       print('Error storing geotag information: $e');
@@ -155,55 +174,3 @@ class FileUploadController extends GetxController {
 
 
 
-// class FileUploadController extends GetxController {
-//   Rx<PickedFile?> selectedFile = Rx<PickedFile?>(null);
-//   String downloadURL = '';
-  
-//   String? uid;
-
-
-//   void fetchUid() async {
-//     User? user = FirebaseAuth.instance.currentUser;
-//     if (user != null) {
-//       String uid = user.uid;
-//       print('User UID: $uid');
-//     } else {
-//       print('No user is currently signed in.');
-//     }
-//   }
-
-//   Future<void> pickFile(ImageSource source) async {
-//     XFile? xFile;
-//     if (source == ImageSource.camera) {
-//       xFile = await ImagePicker().pickImage(source: source);
-//     } else {
-//       xFile = await ImagePicker().pickVideo(source: source);
-//     }
-
-//     if (xFile != null) {
-//       selectedFile.value = PickedFile(xFile.path);
-//     }
-//   }
-
-//   Future<void> uploadFile() async {
-//     if (selectedFile.value != null) {
-//       String userId =
-//           uid ?? ""; 
-//       String fileExtension = selectedFile.value!.path.split('.').last;
-//       Reference storageReference = FirebaseStorage.instance.ref().child(
-//           'user_files/$userId/${DateTime.now()}.$fileExtension'); 
-
-//       UploadTask uploadTask =
-//           storageReference.putFile(File(selectedFile.value!.path));
-
-//       await uploadTask.whenComplete(() async {
-//         print('File uploaded successfully');
-//         downloadURL = await storageReference.getDownloadURL();
-//       });
-
-//       print('Download URL: $downloadURL');
-//     } else {
-//       print('No file selected');
-//     }
-//   }
-// }

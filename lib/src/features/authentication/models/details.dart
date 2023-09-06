@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Details {
@@ -9,8 +7,9 @@ class Details {
   String college;
   int? pincode;
   int? color;
-  int? isCompleted;
+  bool? isCompleted;
   final Timestamp timestamp;
+  int currentQuestion;
 
   Details({
     required this.city,
@@ -19,8 +18,9 @@ class Details {
     required this.college,
     required this.pincode,
     required this.timestamp,
-             this.color,
-             this.isCompleted,      
+    this.color,
+    this.isCompleted,
+    required this.currentQuestion,
   });
 
   Map<String, dynamic> toJson() => {
@@ -31,20 +31,20 @@ class Details {
         "pincode": pincode,
         'timestamp': timestamp,
         "color": color,
-        "isCompleted": isCompleted
+        "isCompleted": isCompleted,
+        "current question": currentQuestion
       };
-  
 
   factory Details.fromJson(Map<String, dynamic> map) {
     int? pincode;
-  if (map['pincode'] is int) {
-    pincode = map['pincode'];
-  } else if (map['pincode'] is String) {
-    int? parsedPincode = int.tryParse(map['pincode']);
-    if (parsedPincode != null) {
-      pincode = parsedPincode;
+    if (map['pincode'] is int) {
+      pincode = map['pincode'];
+    } else if (map['pincode'] is String) {
+      int? parsedPincode = int.tryParse(map['pincode']);
+      if (parsedPincode != null) {
+        pincode = parsedPincode;
+      }
     }
-  }
     return Details(
       city: map['city'],
       type: map['type'],
@@ -52,8 +52,9 @@ class Details {
       college: map['college'],
       pincode: pincode,
       timestamp: map['timestamp'],
-      color:map['color'],
+      color: map['color'],
       isCompleted: map['isCompleted'],
+      currentQuestion: map['current question'],
     );
   }
 }

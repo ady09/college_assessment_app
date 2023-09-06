@@ -1,7 +1,8 @@
 import 'package:college_assessment_app/src/features/authentication/controllers/auth_controller.dart';
-import 'package:college_assessment_app/src/features/authentication/screens/assessment_screen/assessment_screen.dart';
 
 import 'package:college_assessment_app/src/features/authentication/screens/login_screen/login_screen.dart';
+
+
 
 import 'package:college_assessment_app/src/utils/theme/theme.dart';
 
@@ -32,12 +33,12 @@ class MyApp extends StatelessWidget {
       theme: CustomTheme.lightTheme,
       darkTheme: CustomTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: AssessmentScreen(),
+      home: LoginScreen(),
     );
     
   }
 }
-//LoginScreen()
+//
 // FutureBuilder(
 //         // Check if the user is authenticated
 //         future: _auth.authStateChanges().first,

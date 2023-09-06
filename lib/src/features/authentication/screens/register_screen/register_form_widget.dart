@@ -42,7 +42,7 @@ class RegisterForm extends StatelessWidget {
         TextFormField(
           keyboardType: TextInputType.text,
           controller: registerNameController,
-          obscureText: true,
+          
           style: const TextStyle(color: Colors.black87),
           decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(vertical: 20),

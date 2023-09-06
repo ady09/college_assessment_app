@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:college_assessment_app/src/common_widgets/buttons/submit_button.dart';
 import 'package:college_assessment_app/src/common_widgets/form/input_field.dart';
 import 'package:college_assessment_app/src/constants/image_strings.dart';
+import 'package:college_assessment_app/src/constants/text_strings.dart';
 import 'package:college_assessment_app/src/features/authentication/controllers/fetch_data_controller.dart';
 import 'package:college_assessment_app/src/features/authentication/controllers/store_data_controller.dart';
+import 'package:college_assessment_app/src/features/authentication/screens/home_screen/home_screen.dart';
 
 import 'package:college_assessment_app/src/utils/theme/text_theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -24,6 +26,7 @@ class AddNewAssessment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HomeScreen screen = HomeScreen();
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
@@ -83,7 +86,16 @@ class AddNewAssessment extends StatelessWidget {
                 SizedBox(height: height * 0.054),
                 Center(
                     child: SubmitButton(
-                        label: "Submit", onTap: () => _validateData()))
+                        label: "Submit",
+                        onTap: () async {
+                          if (await _validateData()) {
+                            await screen.fetchDataList();
+                          } else {
+                            Get.snackbar("Error",
+                                "Please check if the college details already exists!",
+                                snackPosition: SnackPosition.BOTTOM);
+                          }
+                        }))
               ],
             ),
           ),
@@ -92,18 +104,53 @@ class AddNewAssessment extends StatelessWidget {
     );
   }
 
-  _validateData() {
+  Future<bool> _validateData() async {
     if (_collegeController.text.isNotEmpty &&
         _cityController.text.isNotEmpty &&
         _stateController.text.isNotEmpty &&
         _pincodeController.text.isNotEmpty &&
         _typeController.text.isNotEmpty) {
       try {
-        StoreDataController storeDataController = StoreDataController();
-        int pincode = int.parse(_pincodeController.text);
-        storeDataController.storeData(
-            _cityController.text, _stateController.text, _typeController.text, _collegeController.text, pincode, Timestamp.now());
-        subcollectionController.fetchSubcollectionData();
+        FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+        DocumentReference userDocRef =
+            firestore.collection('users').doc(userIdConst);
+        CollectionReference subcollectionRef = userDocRef.collection('details');
+        DocumentReference docRef =
+            subcollectionRef.doc(_collegeController.text);
+
+        DocumentSnapshot docSnapshot = await docRef.get();
+
+        if (docSnapshot.exists) {
+          return false;
+        } else {
+          StoreDataController storeDataController = StoreDataController();
+
+          try {
+            String pincodeText =
+                _pincodeController.text.replaceAll(' ', '').trim();
+
+            if (pincodeText.isNotEmpty &&
+                pincodeText.contains(RegExp(r'^[0-9]+$'))) {
+              int pincode = int.parse(pincodeText);
+              storeDataController.storeData(
+                  _cityController.text.trim(),
+                  _stateController.text.trim(),
+                  _typeController.text.trim(),
+                  _collegeController.text.trim(),
+                  pincode,
+                  Timestamp.now(),
+                  0);
+            } else {
+              Get.snackbar("Pincode Error",
+                  "Please Enter a valid Pincode with only digits.");
+            }
+          } catch (e) {
+            Get.snackbar("Error", "An unexpected error occurred: $e");
+          }
+
+          await subcollectionController.fetchSubcollectionData();
+        }
       } catch (e) {
         e.toString();
       }
@@ -117,55 +164,6 @@ class AddNewAssessment extends StatelessWidget {
       Get.snackbar("Error", "All fields are mandatory!",
           snackPosition: SnackPosition.BOTTOM);
     }
-  }
-
-  // void storeData() async {
-  //   User? user = FirebaseAuth.instance.currentUser;
-  //   if (user != null) {
-  //     CollectionReference collectionReference =
-  //         FirebaseFirestore.instance.collection('users');
-
-  //     DocumentSnapshot userDoc = await collectionReference.doc(user.uid).get();
-
-  //     Map<String, dynamic> existingData = {};
-
-  //     if (userDoc.exists) {
-  //       existingData = userDoc.data() as Map<String, dynamic>;
-  //     }
-
-  //     Map<String, dynamic> newUserData = {
-  //       'college': _collegeController.text,
-  //       'city': _cityController.text,
-  //       'state': _stateController.text,
-  //       'pincode': _pincodeController.text,
-  //       'type': _typeController.text
-  //     };
-
-  //     Map<String, dynamic> combinedData = {...existingData, ...newUserData};
-
-  //     await collectionReference.doc(user.uid).set(combinedData);
-  //   }
-  // }
-
-  void createAndStoreCollection() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      CollectionReference userCollection =
-          FirebaseFirestore.instance.collection('users');
-
-      DocumentReference newCollectionRef =
-          userCollection.doc(user.uid).collection('details').doc();
-
-      Map<String, dynamic> newData = {
-        'college': _collegeController.text,
-        'city': _cityController.text,
-        'state': _stateController.text,
-        'pincode': _pincodeController.text,
-        'type': _typeController.text,
-        'timestamp': FieldValue.serverTimestamp(),
-      };
-
-      await newCollectionRef.set(newData);
-    }
+    return true;
   }
 }
