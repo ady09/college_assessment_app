@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:college_assessment_app/src/common_widgets/buttons/assessmentButton.dart';
 import 'package:college_assessment_app/src/common_widgets/buttons/submit_button.dart';
-
+import 'package:college_assessment_app/src/common_widgets/list_animation/present_list.dart';
 import 'package:college_assessment_app/src/constants/text_strings.dart';
 import 'package:college_assessment_app/src/features/authentication/controllers/assessment_controller.dart';
 import 'package:college_assessment_app/src/features/authentication/models/details.dart';
@@ -23,32 +23,27 @@ import '../../controllers/file_uploader_controller.dart';
 import '../../models/assessment.dart';
 import 'text_answer.dart';
 
-// ignore: must_be_immutable
 class AssessmentScreen extends StatelessWidget {
   AssessmentScreen(
       {super.key,
       required this.currentQuestionIndexFirebase,
       required this.collegeFirebase});
 
-  // final AssessmentController _controller = Get.find<AssessmentController>();
-
+  // static final AssessmentController _assessmentController =
   final AssessmentController _controller = Get.put(AssessmentController());
 
   int currentQuestionIndexFirebase;
   final String collegeFirebase;
-  TextEditingController _commentsTextController = TextEditingController();
   final QuestionData data = QuestionData();
 
-
+  // AssessmentScreen({
   final FileUploadController _fileUploadController =
       Get.put(FileUploadController());
 
   final ScrollController _scrollController = ScrollController();
-   
 
   @override
   Widget build(BuildContext context) {
-    
     final DocumentReference docRef = FirebaseFirestore.instance
         .collection('users')
         .doc(userIdConst)
@@ -71,7 +66,8 @@ class AssessmentScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: Obx(() {
-        
+        final int currentQuestionIndex =
+            _controller.currentQuestionIndex.value + 1;
         return SingleChildScrollView(
           controller: _scrollController,
           child: Padding(
@@ -189,7 +185,8 @@ class AssessmentScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                 Row(
+                const SizedBox(height: 40),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                    children: [
                      Padding(
@@ -209,7 +206,6 @@ class AssessmentScreen extends StatelessWidget {
                      ),
                    ],
                  ),
-                const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: Text(
@@ -222,7 +218,6 @@ class AssessmentScreen extends StatelessWidget {
                     widget: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                      controller: _commentsTextController,
                       maxLines: null,
                       decoration: const InputDecoration(
                         hintText: 'Enter text here', 
@@ -230,63 +225,49 @@ class AssessmentScreen extends StatelessWidget {
                       )),
                 )),
                 const SizedBox(height: 40),
-               
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SubmitButton(
                       label: "Cancel",
-                      onTap: () {
-                        Get.to(HomeScreen());
-                      },
+                      onTap: () {},
                       userWidth: width * 0.36,
                     ),
                     SizedBox(width: width * 0.036),
                     SubmitButton(
                       label: "Next",
                       onTap: () async {
-                        print(_controller.data.answers);
-                        _commentsTextController.clear();
-                        if (_commentsTextController.text.isNotEmpty) {
+                        if (currentQuestionIndexFirebase <
+                            data.questions.length - 1) {
+                          currentQuestionIndexFirebase++;
+                          Map<String, dynamic> dataToUpdate = {
+                            'current question': currentQuestionIndexFirebase,
+                          };
+                          await docRef.update(dataToUpdate).then((_) {
+                            print(
+                                "Document successfully updated to $currentQuestionIndexFirebase");
+                          });
+                          _controller
+                              .onNextQuestion(currentQuestionIndexFirebase);
+                        } else if (currentQuestionIndexFirebase ==
+                            data.questions.length - 1) {
+                          Map<String, dynamic> isCompleted = {
+                            'isCompleted': true,
+                          };
+                          await docRef.update(isCompleted);
+                          
+                          // TaskTile(await _fetchDocument());
                           Get.snackbar(
-                              "Required", "Please fill all the details");
+                              "Success", "Assessment Submitted Successfully");
+                          Get.to(HomeScreen());
                         } else {
-                          if (currentQuestionIndexFirebase <
-                              data.questions.length - 1) {
-                            currentQuestionIndexFirebase++;
-                            Map<String, dynamic> dataToUpdate = {
-                              'current question': currentQuestionIndexFirebase,
-                            };
-
-                            await docRef.update(dataToUpdate).then((_) {
-                              print(
-                                  "Document successfully updated to $currentQuestionIndexFirebase");
-                            });
-                            _controller
-                                .onNextQuestion(currentQuestionIndexFirebase);
-                          } else if (currentQuestionIndexFirebase ==
-                              data.questions.length - 1) {
-                            Map<String, dynamic> isCompleted = {
-                              'isCompleted': true,
-                            };
-                            await docRef.update(isCompleted);
-                            _controller.isDisabled.value = true;
-                            print(_controller.isDisabled.value);
-                            //TaskTile(await _fetchDocument());
-
-                            Get.snackbar(
-                                "Success", "Assessment Submitted Successfully");
-                            Get.to(HomeScreen());
-                          } else {
-                            print(_controller.isDisabled.value);
-                            //TaskTile(await _fetchDocument());
-                            Get.snackbar(
-                                "Success", "Assessment Submitted Successfully");
-                            Get.to(HomeScreen());
-                          }
-
-                          _scrollToTop();
+                          // TaskTile(await _fetchDocument());
+                          Get.snackbar(
+                              "Success", "Assessment Submitted Successfully");
+                          Get.to(HomeScreen());
                         }
+
+                        _scrollToTop();
                       },
                       userWidth: width * 0.48,
                     ),
