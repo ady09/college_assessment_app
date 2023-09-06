@@ -40,7 +40,9 @@ The **College Assessment App** is a feature-rich Flutter application designed fo
 
 ## Screenshots
 
-![sign In](https://github.com/ady09/college_assessment_app/assets/64699751/12c4b2a8-f765-4562-9d20-fda591623490)
+<img src="![sign In](https://github.com/ady09/college_assessment_app/assets/64699751/12c4b2a8-f765-4562-9d20-fda591623490)" alt="Alt Text" width="200" height="150">
+
+
 ![registerApp](https://github.com/ady09/college_assessment_app/assets/64699751/b4c833cf-fd89-47a6-89fb-e006af82355e)
 ![assessment](https://github.com/ady09/college_assessment_app/assets/64699751/8995201a-8efe-44e8-a741-baf5f8e8b093)
 ![HomeScreen](https://github.com/ady09/college_assessment_app/assets/64699751/d62244b2-a275-4948-be9b-46d9cc5dfe98)
