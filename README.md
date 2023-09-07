@@ -58,9 +58,17 @@ The **College Assessment App** is a feature-rich Flutter application designed fo
 
 4. Create a Project: Use flutter create project_name to create a new Flutter project.
 
-5.Run Your App: Navigate to your project directory and use flutter run to start your app on a device or emulator.
+5. Run Your App: Navigate to your project directory and use flutter run to start your app on a device or emulator.
 
 6. Start Coding: Open your project in your IDE and edit the code in lib/main.dart.
+
+
+### Version Used for this Project
+
+Flutter 3.13.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision ff5b5b5fa6 (13 days ago) • 2023-08-24 08:12:28 -0500
+Engine • revision b20183e040
+Tools • Dart 3.1.0 • DevTools 2.25.0
 
 
 ### Prerequisites
