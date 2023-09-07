@@ -48,7 +48,19 @@ The **College Assessment App** is a feature-rich Flutter application designed fo
 ![assessment (1)](https://github.com/ady09/college_assessment_app/assets/64699751/68589fe9-48f2-4867-9351-b79ce37a8602)
 
 
-## Getting Started
+## Flutter Setup
+
+1. Install Flutter: Download and install Flutter from the official website for your OS.
+
+2. Install an IDE: Choose between Android Studio or VSCode. Install the Flutter and Dart extensions for your chosen IDE.
+
+3. Check Installation: Run flutter doctor in your terminal to check your Flutter installation and resolve any issues.
+
+4. Create a Project: Use flutter create project_name to create a new Flutter project.
+
+5.Run Your App: Navigate to your project directory and use flutter run to start your app on a device or emulator.
+
+6. Start Coding: Open your project in your IDE and edit the code in lib/main.dart.
 
 
 ### Prerequisites
