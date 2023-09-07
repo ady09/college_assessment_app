@@ -66,8 +66,9 @@ The **College Assessment App** is a feature-rich Flutter application designed fo
 ### Version Used for this Project
 
 Flutter 3.13.2 
+
 • channel stable 
-• https://github.com/flutter/flutter.git
+
 • Dart 3.1.0 • DevTools 2.25.0
 
 
